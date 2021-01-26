@@ -23,6 +23,27 @@ import json
 
 
 class Dataset(object):
+    """
+    A class used to share common dataset functions and attributes.
+    
+    ...
+    
+    Attributes
+    ----------
+    model_name: str
+        name of the model (Ex. 'MNIST')
+    config_path: str
+        path configuration file
+    
+    Methods
+    -------
+    load_config():
+        load configuration file
+    get_dataset():
+        load the dataset defined by model_name and pre_process it
+    get_tf_data():
+        get a tf.data.Dataset object of the loaded dataset. 
+    """
     def __init__(self, model_name, config_path='config.json'):
         self.model_name = model_name
         self.config_path = config_path
