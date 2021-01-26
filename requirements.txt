@@ -1,0 +1,8 @@
+numpy
+pandas
+tensorflow-addons
+opencv-python
+tqdm
+tensorflow
+matplotlib
+tensorflow-datasets
