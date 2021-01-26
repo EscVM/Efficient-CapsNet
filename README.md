@@ -1,5 +1,5 @@
 <h1 align="center"> ~ Efficient-CapsNet ~ </h1>
-Are you tired of over inflated and overused convolutional neural networks? You're right! It's time for **CAPSULES** :)
+Are you tired of over inflated and overused convolutional neural networks? You're right! It's time for <strong>CAPSULES</strong> :)
 
 This repository has been made for two primarly reasons:
 
