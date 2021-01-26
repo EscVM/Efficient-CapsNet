@@ -75,6 +75,7 @@ def build_graph(input_shape, mode, verbose):
         network input shape
     mode: str
         working mode ('train', 'test' & 'play')
+    verbose: bool
     """
     inputs = tf.keras.Input(input_shape)
     y_true = tf.keras.layers.Input(shape=(10,))
