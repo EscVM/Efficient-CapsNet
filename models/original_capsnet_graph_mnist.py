@@ -20,6 +20,16 @@ import tensorflow_addons as tfa
 
 
 def capsnet_graph(input_shape, routing):
+    """
+    Original CapsNet graph architecture described in "dynamic routinig between capsules".
+    
+    Parameters
+    ----------   
+    input_shape: list
+        network input shape
+    routing: int
+        number of routing iterations
+    """
     inputs = tf.keras.Input(input_shape)
     
     x = tf.keras.layers.Conv2D(256, 9, activation="relu")(inputs)
@@ -33,6 +43,14 @@ def capsnet_graph(input_shape, routing):
 
 
 def generator_graph(input_shape):
+    """
+    Generator graph architecture.
+    
+    Parameters
+    ----------   
+    input_shape: list
+        network input shape
+    """
     inputs = tf.keras.Input(16*10)
     
     x = tf.keras.layers.Dense(512, activation='relu')(inputs)
@@ -44,6 +62,19 @@ def generator_graph(input_shape):
 
 
 def build_graph(input_shape, mode, n_routing, verbose):
+    """
+    Original CapsNet graph architecture with reconstruction regularizer. The network can be initialize with different modalities.
+    
+    Parameters
+    ----------   
+    input_shape: list
+        network input shape
+    mode: str
+        working mode ('train' & 'test')
+    n_routing: int
+        number of routing iterations
+    verbose: bool
+    """
     inputs = tf.keras.Input(input_shape)
     y_true = tf.keras.Input(shape=(10))
     noise = tf.keras.layers.Input(shape=(10, 16))
