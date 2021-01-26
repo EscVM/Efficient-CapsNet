@@ -20,7 +20,7 @@ import tensorflow as tf
 
 class SquashHinton(tf.keras.layers.Layer):
     """
-    Squash activation functin presented in 'Dynamic routinig between capsules'.
+    Squash activation function presented in 'Dynamic routinig between capsules'.
 
     ...
     
