@@ -1,0 +1,15 @@
+{
+    "eps": 10e-21,
+    "MNIST_INPUT_SHAPE": [28,28,1], 
+    "SMALLNORB_INPUT_SHAPE": [48,48,2],
+    "lr": 5e-4,
+    "lmd_gen": 0.392,
+    "lr_dec": 0.97,
+    "batch_size": 16,
+    "epochs":150,
+    "saved_model_dir": "bin",
+    "tb_log_save_dir": "logs",
+    "mnist_path": "mnist.npz",
+    "scale_smallnorb": 64,
+    "patch_smallnorb": 48
+}
