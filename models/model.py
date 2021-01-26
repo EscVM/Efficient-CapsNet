@@ -78,7 +78,6 @@ class Model(object):
             
         
     def predict(self, dataset_test):
-        """Return a y_pred and X_gen"""
         return self.model.predict(dataset_test)
     
 
