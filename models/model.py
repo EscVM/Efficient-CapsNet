@@ -16,9 +16,9 @@
 import numpy as np
 import tensorflow as tf
 from utils.layers import PrimaryCaps, FCCaps, Length
-from utils.tools import get_callbacks, marginLoss
+from utils.tools import get_callbacks, marginLoss, multiAccuracy
 from utils.dataset import Dataset
-from models import efficient_capsnet_graph_mnist, efficient_capsnet_graph_smallnorb, original_capsnet_graph_mnist
+from models import efficient_capsnet_graph_mnist, efficient_capsnet_graph_smallnorb, efficient_capsnet_graph_multimnist, original_capsnet_graph_mnist
 import os
 import json
 
@@ -57,10 +57,16 @@ class Model(object):
     def evaluate(self, X_test, y_test):
         print('-'*30 + f'{self.model_name} Evaluation' + '-'*30)
         y_pred, X_gen =  self.model.predict(X_test)
-        acc = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
+        if self.model_name == "MULTIMNIST":
+            acc = multiAccuracy(y_test, y_pred)
+        else:
+            acc = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
         print('Test acc:', acc)
         print(f"Test error [%]: {(1 - acc):.4%}")
-        print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
+        if self.model_name == "MULTIMNIST":
+            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
+        else:
+            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
 
 
     def save_graph_weights(self):
@@ -85,6 +91,8 @@ class EfficientCapsNet(Model):
             self.model = efficient_capsnet_graph_mnist.build_graph(self.config['MNIST_INPUT_SHAPE'], self.mode, self.verbose)
         elif self.model_name == 'SMALLNORB':
             self.model = efficient_capsnet_graph_smallnorb.build_graph(self.config['SMALLNORB_INPUT_SHAPE'], self.mode, self.verbose)
+        elif self.model_name == 'MULTIMNIST':
+            self.model = efficient_capsnet_graph_multimnist.build_graph(self.config['MULTIMNIST_INPUT_SHAPE'], self.mode, self.verbose)
             
     def train(self, dataset=None, initial_epoch=0):
         callbacks = get_callbacks(self.tb_path, self.model_path_new_train, self.config['lr_dec'], self.config['lr'])
@@ -93,7 +101,13 @@ class EfficientCapsNet(Model):
             dataset = Dataset(self.model_name, self.config_path)
         dataset_train, dataset_val = dataset.get_tf_data()    
 
-        self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
+        if self.model_name == 'MULTIMNIST':
+            self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
+              loss=[marginLoss, 'mse', 'mse'],
+              loss_weights=[1., self.config['lmd_gen']/2,self.config['lmd_gen']/2],
+              metrics={'Efficient_CapsNet': 'accuracy'})
+        else:
+            self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
               loss=[marginLoss, 'mse'],
               loss_weights=[1., self.config['lmd_gen']],
               metrics={'Efficient_CapsNet': 'accuracy'})
@@ -138,7 +152,7 @@ class CapsNet(Model):
         self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
               loss=[marginLoss, 'mse'],
               loss_weights=[1., self.config['lmd_gen']],
-              metrics={'Original_CapsNet': 'accuracy'})
+              metrics={'Original_CapsNet': multiAccuracy})
 
         print('-'*30 + f'{self.model_name} train' + '-'*30)
 

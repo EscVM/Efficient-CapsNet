@@ -79,7 +79,5 @@ def build_graph(input_shape, mode, n_routing, verbose):
         return tf.keras.models.Model(inputs, [digit_caps_len, x_gen_eval], name='CapsNet_Generator')
     elif mode == 'play':
         return tf.keras.models.Model([inputs, y_true, noise], [digit_caps_len, x_gen_play], name='CapsNet_Generator')
-    elif mode == 'PCA':
-        return tf.keras.models.Model(inputs, [primary, digit_caps, digit_caps_len, x_gen_eval],name='CapsNet_Generator')
     else:
         raise RuntimeError('mode not recognized')

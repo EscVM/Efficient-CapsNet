@@ -47,3 +47,14 @@ def marginLoss(y_true, y_pred):
     lbd * (1 - y_true) * tf.square(tf.maximum(0., y_pred - m_minus))
 
     return tf.reduce_mean(tf.reduce_sum(L, axis=1))
+
+
+def multiAccuracy(y_true, y_pred):
+    
+    label_pred = tf.argsort(y_pred,axis=-1)[:,-2:]
+    label_true = tf.argsort(y_true,axis=-1)[:,-2:]
+    
+    acc = tf.reduce_sum(tf.cast(label_pred[:,:1]==label_true,tf.int8),axis=-1) + 
+          tf.reduce_sum(tf.cast(label_pred[:,1:]==label_true,tf.int8),axis=-1)
+    acc /= 2
+    return tf.reduce_mean(acc,axis=-1)

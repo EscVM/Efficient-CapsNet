@@ -50,7 +50,9 @@ class SquashHinton(tf.keras.layers.Layer):
 
     def compute_output_shape(self, input_shape):
         return input_shape
-    
+
+
+
 class Squash(tf.keras.layers.Layer):
     """
     Squash activation used in 'Efficient-CapsNet: Capsule Network with Self-Attention Routing'.
@@ -128,7 +130,8 @@ class PrimaryCaps(tf.keras.layers.Layer):
         
         return x
     
-    
+
+
 class FCCaps(tf.keras.layers.Layer):
     """
     Fully-connected caps layer. It exploites the routing mechanism, explained in 'Efficient-CapsNet: Capsule Network with Self-     Attention Routing', to create a parent layer of capsules. 
@@ -186,7 +189,9 @@ class FCCaps(tf.keras.layers.Layer):
         }
         base_config = super(FCCaps, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
-    
+
+
+
 class Length(tf.keras.layers.Layer):
     """
     Compute the length of each capsule n of a layer l.
@@ -215,7 +220,9 @@ class Length(tf.keras.layers.Layer):
     def get_config(self):
         config = super(Length, self).get_config()
         return config
-    
+
+
+
 class Mask(tf.keras.layers.Layer):
     """
     Mask operation described in 'Dynamic routinig between capsules'.
@@ -224,18 +231,29 @@ class Mask(tf.keras.layers.Layer):
     
     Methods
     -------
-    call(inputs)
+    call(inputs, double_mask)
         mask a capsule layer
-
+        set double_mask for multimnist dataset
     """
-    def call(self, inputs, **kwargs):
-        if type(inputs) is list:  
-            inputs, mask = inputs
+    def call(self, inputs, double_mask=None, **kwargs):
+        if type(inputs) is list:
+            if double_mask:
+                inputs, mask1, mask2 = inputs
+            else:
+                inputs, mask = inputs
         else:  
             x = tf.sqrt(tf.reduce_sum(tf.square(inputs), -1))
-            mask = tf.keras.backend.one_hot(indices=tf.argmax(x, 1), num_classes=x.get_shape().as_list()[1])
+            if double_mask:
+                mask1 = tf.keras.backend.one_hot(tf.argsort(x,direction='DESCENDING',axis=-1)[...,0],num_classes=x.get_shape().as_list()[1])
+            mask2 = tf.keras.backend.one_hot(tf.argsort(x,direction='DESCENDING',axis=-1)[...,1],num_classes=x.get_shape().as_list()[1])
+            else:
+                mask = tf.keras.backend.one_hot(indices=tf.argmax(x, 1), num_classes=x.get_shape().as_list()[1])
 
-        masked = tf.keras.backend.batch_flatten(inputs * tf.expand_dims(mask, -1))
+        if double_mask:
+            masked1 = tf.keras.backend.batch_flatten(inputs * tf.expand_dims(mask1, -1))
+            masked2 = tf.keras.backend.batch_flatten(inputs * tf.expand_dims(mask2, -1))
+        else:
+            masked = tf.keras.backend.batch_flatten(inputs * tf.expand_dims(mask, -1))
         return masked
 
     def compute_output_shape(self, input_shape):
