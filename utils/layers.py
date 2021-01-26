@@ -90,7 +90,8 @@ class Squash(tf.keras.layers.Layer):
 
 class PrimaryCaps(tf.keras.layers.Layer):
     """
-    Create a primary capsule layer with the methodology described in 'Efficient-CapsNet: Capsule Network with Self-Attention         Routing'. Properties of each capsule s_n are exatracted using a 2D depthwise convolution.
+    Create a primary capsule layer with the methodology described in 'Efficient-CapsNet: Capsule Network with Self-Attention Routing'. 
+    Properties of each capsule s_n are exatracted using a 2D depthwise convolution.
     
     ...
     
@@ -134,7 +135,8 @@ class PrimaryCaps(tf.keras.layers.Layer):
 
 class FCCaps(tf.keras.layers.Layer):
     """
-    Fully-connected caps layer. It exploites the routing mechanism, explained in 'Efficient-CapsNet: Capsule Network with Self-     Attention Routing', to create a parent layer of capsules. 
+    Fully-connected caps layer. It exploites the routing mechanism, explained in 'Efficient-CapsNet: Capsule Network with Self-Attention Routing', 
+    to create a parent layer of capsules. 
     
     ...
     
