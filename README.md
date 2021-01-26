@@ -1,6 +1,6 @@
 <h1 align="center"> ~ Efficient-CapsNet ~ </h1>
 Are you tired of over inflated and overused convolutional neural networks? You're right! It's time for <strong>CAPSULES</strong> :)
-
+<br>
 This repository has been made for two primarly reasons:
 
  - open source the code (most of) developed during our "first-stage" research on capsules, summarized by the forthcoming "Efficient-CapsNet: Capsule Network with Self-Attention Routing" article. The repository let you play with Efficient-CapsNet and let you set the base for your own experiments.
