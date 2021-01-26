@@ -61,12 +61,13 @@ class Model(object):
             acc = multiAccuracy(y_test, y_pred)
         else:
             acc = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
+        test_error = 1 - acc
         print('Test acc:', acc)
-        print(f"Test error [%]: {(1 - acc):.4%}")
+        print(f"Test error [%]: {(test_error):.4%}")
         if self.model_name == "MULTIMNIST":
-            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
+            print(f"N° misclassified images: {test_error*self.config['n_overlay_multimnist']*len(y_test)} out of {self.config['n_overlay_multimnist']*len(y_test)}")
         else:
-            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
+            print(f"N° misclassified images: {test_error*len(y_test)} out of {len(y_test)}")
 
 
     def save_graph_weights(self):
@@ -116,7 +117,7 @@ class EfficientCapsNet(Model):
 
         history = self.model.fit(dataset_train,
           epochs=self.config[f'epochs'],
-          validation_data=(dataset_val), batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
+          validation_data=dataset_val, batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
           callbacks=callbacks)
         
         return history
@@ -158,7 +159,7 @@ class CapsNet(Model):
 
         history = self.model.fit(dataset_train,
           epochs=self.config['epochs'],
-          validation_data=(dataset_val), batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
+          validation_data=dataset_val, batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
           callbacks=callbacks)
         
         return history

@@ -13,5 +13,7 @@
     "mnist_path": "mnist.npz",
     "scale_smallnorb": 64,
     "patch_smallnorb": 48,
-    "_multimnist"
+    "n_overlay_multimnist": 1000,
+    "shift_multimnist": 6,
+    "pad_multimnist": 4
 }
