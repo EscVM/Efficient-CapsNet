@@ -19,6 +19,14 @@ from utils.layers import PrimaryCaps, FCCaps, Length, Mask
 
 
 def efficient_capsnet_graph(input_shape):
+    """
+    Efficient-CapsNet graph architecture.
+    
+    Parameters
+    ----------   
+    input_shape: list
+        network input shape
+    """
     inputs = tf.keras.Input(input_shape)
     
     x = tf.keras.layers.Conv2D(32,5,activation="relu", padding='valid', kernel_initializer='he_normal')(inputs)
@@ -39,6 +47,14 @@ def efficient_capsnet_graph(input_shape):
 
 
 def generator_graph(input_shape):
+    """
+    Generator graph architecture.
+    
+    Parameters
+    ----------   
+    input_shape: list
+        network input shape
+    """
     inputs = tf.keras.Input(16*10)
     
     x = tf.keras.layers.Dense(512, activation='relu', kernel_initializer='he_normal')(inputs)
@@ -50,6 +66,16 @@ def generator_graph(input_shape):
 
 
 def build_graph(input_shape, mode, verbose):
+    """
+    Efficient-CapsNet graph architecture with reconstruction regularizer. The network can be initialize with different modalities.
+    Parameters
+    ----------   
+    input_shape: list
+        network input shape
+    mode: str
+        working mode ('train', 'test' & 'play')
+    verbose: bool
+    """
     inputs = tf.keras.Input(input_shape)
     y_true = tf.keras.layers.Input(shape=(10,))
     noise = tf.keras.layers.Input(shape=(10, 16))
