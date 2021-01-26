@@ -96,6 +96,7 @@ def generator_graph(input_shape):
 def build_graph(input_shape, mode, verbose):
     """
     Efficient-CapsNet graph architecture with reconstruction regularizer. The network can be initialize with different modalities.
+    
     Parameters
     ----------   
     input_shape: list
