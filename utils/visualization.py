@@ -81,7 +81,7 @@ def plotHistory(history):
     """
     Plot the loss and accuracy curves for training and validation 
     """
-    pd.DataFrame(history.history).plot(figsize=(8, 5))
+    pd.DataFrame(history.history).plot(figsize=(8, 5), y=list(history.history.keys())[0:-1:2])
     plt.grid(True)
     plt.show()
         
