@@ -11,4 +11,4 @@ def _exec_notebook(path):
 
 
 def test():
-    _exec_notebook('efficient_capsnet_test.ipynb')
+    _exec_notebook('original_capsnet_train.ipynb')
