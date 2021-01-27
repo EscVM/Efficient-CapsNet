@@ -6,4 +6,5 @@ tqdm
 tensorflow
 matplotlib
 pytest
+jupyter
 tensorflow-datasets
