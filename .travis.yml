@@ -9,4 +9,4 @@ install:
   
  
 script:
-  - py.test
+  - test_nb.py
