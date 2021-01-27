@@ -5,4 +5,5 @@ opencv-python
 tqdm
 tensorflow
 matplotlib
+pytest
 tensorflow-datasets
