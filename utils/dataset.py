@@ -18,7 +18,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import os
-from utils import pre_process_mnist, pre_process_smallnorb
+from utils import pre_process_mnist, pre_process_multimnist, pre_process_smallnorb
 import json
 
 
@@ -53,7 +53,7 @@ class Dataset(object):
             self.X_test, self.y_test = pre_process_mnist.pre_process(self.X_test, self.y_test)
             self.class_names = list(range(10))
             print("[INFO] Dataset loaded!")
-        if self.model_name == 'SMALLNORB':
+        elif self.model_name == 'SMALLNORB':
                     # import the datatset
             (ds_train, ds_test), ds_info = tfds.load(
                 'smallnorb',
@@ -71,6 +71,16 @@ class Dataset(object):
             self.X_test_patch, self.y_test = pre_process_smallnorb.test_patches(self.X_test, self.y_test, self.config)
             self.class_names = ds_info.features['label_category'].names
             print("[INFO] Dataset loaded!")
+        elif self.model_name == 'MULTIMNIST':
+            (self.X_train, self.y_train), (self.X_test, self.y_test) = tf.keras.datasets.mnist.load_data(path=self.config['mnist_path'])
+            # prepare the data
+            self.X_train = pre_process_multimnist.pad_dataset(self.X_train, self.config["pad_multimnist"])
+            self.X_test = pre_process_multimnist.pad_dataset(self.X_test, self.config["pad_multimnist"])
+            self.X_train, self.y_train = pre_process_multimnist.pre_process(self.X_train, self.y_train)
+            self.X_test, self.y_test = pre_process_multimnist.pre_process(self.X_test, self.y_test)
+            self.test_dataset = 
+            self.class_names = list(range(10))
+            print("[INFO] Dataset loaded!")
 
 
     def get_tf_data(self):
@@ -78,5 +88,7 @@ class Dataset(object):
             dataset_train, dataset_test = pre_process_mnist.generate_tf_data(self.X_train, self.y_train, self.X_test, self.y_test, self.config['batch_size'])
         elif self.model_name == 'SMALLNORB':
             dataset_train, dataset_test = pre_process_smallnorb.generate_tf_data(self.X_train, self.y_train, self.X_test_patch, self.y_test, self.config['batch_size'])
+        elif self.model_name == 'MULTIMNIST':
+            dataset_train, dataset_test = pre_process_multimnist.generate_tf_data(self.X_train, self.y_train, self.X_test, self.y_test, self.config['batch_size'])
 
         return dataset_train, dataset_test

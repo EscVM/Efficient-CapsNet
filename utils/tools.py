@@ -38,7 +38,6 @@ def get_callbacks(tb_log_save_path, saved_model_path, lr_dec, lr):
 
 
 def marginLoss(y_true, y_pred):
-    
     lbd = 0.5
     m_plus = 0.9
     m_minus = 0.1
@@ -50,7 +49,6 @@ def marginLoss(y_true, y_pred):
 
 
 def multiAccuracy(y_true, y_pred):
-    
     label_pred = tf.argsort(y_pred,axis=-1)[:,-2:]
     label_true = tf.argsort(y_true,axis=-1)[:,-2:]
     
