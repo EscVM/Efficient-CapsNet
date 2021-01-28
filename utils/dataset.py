@@ -99,7 +99,6 @@ class Dataset(object):
             self.X_test = pre_process_multimnist.pad_dataset(self.X_test, self.config["pad_multimnist"])
             self.X_train, self.y_train = pre_process_multimnist.pre_process(self.X_train, self.y_train)
             self.X_test, self.y_test = pre_process_multimnist.pre_process(self.X_test, self.y_test)
-            self.test_dataset = 
             self.class_names = list(range(10))
             print("[INFO] Dataset loaded!")
 

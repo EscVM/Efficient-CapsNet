@@ -17,7 +17,6 @@ import numpy as np
 import tensorflow as tf
 
 
-
 class SquashHinton(tf.keras.layers.Layer):
     """
     Squash activation function presented in 'Dynamic routinig between capsules'.
