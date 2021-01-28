@@ -95,12 +95,13 @@ class Model(object):
         else:
             y_pred, X_gen =  self.model.predict(X_test)
             acc = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
+        test_error = 1 - acc
         print('Test acc:', acc)
-        print(f"Test error [%]: {(1 - acc):.4%}")
+        print(f"Test error [%]: {(test_error):.4%}")
         if self.model_name == "MULTIMNIST":
-            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
+            print(f"N° misclassified images: {int(test_error*len(y_test)*self.config['n_overlay_multimnist'])} out of {len(y_test)*self.config['n_overlay_multimnist']}")
         else:
-            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
+            print(f"N° misclassified images: {int(test_error*len(y_test))} out of {len(y_test)}")
 
 
     def save_graph_weights(self):
@@ -166,16 +167,18 @@ class EfficientCapsNet(Model):
               loss=[marginLoss, 'mse', 'mse'],
               loss_weights=[1., self.config['lmd_gen']/2,self.config['lmd_gen']/2],
               metrics={'Efficient_CapsNet': 'accuracy'})
+            steps = 10*int(dataset.y_train.shape[0] / self.config['batch_size'])
         else:
             self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
               loss=[marginLoss, 'mse'],
               loss_weights=[1., self.config['lmd_gen']],
               metrics={'Efficient_CapsNet': 'accuracy'})
+            steps=None
 
         print('-'*30 + f'{self.model_name} train' + '-'*30)
 
         history = self.model.fit(dataset_train,
-          epochs=self.config[f'epochs'],
+          epochs=self.config[f'epochs'], steps_per_epoch=steps,
           validation_data=(dataset_val), batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
           callbacks=callbacks)
         

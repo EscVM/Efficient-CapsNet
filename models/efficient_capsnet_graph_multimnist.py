@@ -101,7 +101,7 @@ def build_graph(input_shape, mode, verbose):
     x_gen_eval1,x_gen_eval2 = generator(masked1),generator(masked2)
 
     if mode == 'train':   
-        return tf.keras.models.Model([inputs, y_true], [digit_caps_len, x_gen_train1,x_gen_train2], name='Efficinet_CapsNet_Generator')
+        return tf.keras.models.Model([inputs, y_true1,y_true2], [digit_caps_len, x_gen_train1,x_gen_train2], name='Efficinet_CapsNet_Generator')
     elif mode == 'test':
         return tf.keras.models.Model(inputs, [digit_caps_len, x_gen_eval1,x_gen_eval2], name='Efficinet_CapsNet_Generator')
     else:

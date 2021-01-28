@@ -111,7 +111,7 @@ class PrimaryCaps(tf.keras.layers.Layer):
     call(inputs)
         compute the primary capsule layer
     """
-    def __init__(self, F, K, N, D, s, **kwargs):
+    def __init__(self, F, K, N, D, s=1, **kwargs):
         super(PrimaryCaps, self).__init__(**kwargs)
         self.F = F
         self.K = K
