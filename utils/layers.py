@@ -20,7 +20,7 @@ import tensorflow as tf
 
 class SquashHinton(tf.keras.layers.Layer):
     """
-    Squash activation functin presented in 'Dynamic routinig between capsules'.
+    Squash activation function presented in 'Dynamic routinig between capsules'.
 
     ...
     
@@ -90,7 +90,8 @@ class Squash(tf.keras.layers.Layer):
 
 class PrimaryCaps(tf.keras.layers.Layer):
     """
-    Create a primary capsule layer with the methodology described in 'Efficient-CapsNet: Capsule Network with Self-Attention         Routing'. Properties of each capsule s_n are exatracted using a 2D depthwise convolution.
+    Create a primary capsule layer with the methodology described in 'Efficient-CapsNet: Capsule Network with Self-Attention Routing'. 
+    Properties of each capsule s_n are exatracted using a 2D depthwise convolution.
     
     ...
     
@@ -134,7 +135,8 @@ class PrimaryCaps(tf.keras.layers.Layer):
 
 class FCCaps(tf.keras.layers.Layer):
     """
-    Fully-connected caps layer. It exploites the routing mechanism, explained in 'Efficient-CapsNet: Capsule Network with Self-     Attention Routing', to create a parent layer of capsules. 
+    Fully-connected caps layer. It exploites the routing mechanism, explained in 'Efficient-CapsNet: Capsule Network with Self-Attention Routing', 
+    to create a parent layer of capsules. 
     
     ...
     
@@ -245,7 +247,7 @@ class Mask(tf.keras.layers.Layer):
             x = tf.sqrt(tf.reduce_sum(tf.square(inputs), -1))
             if double_mask:
                 mask1 = tf.keras.backend.one_hot(tf.argsort(x,direction='DESCENDING',axis=-1)[...,0],num_classes=x.get_shape().as_list()[1])
-            mask2 = tf.keras.backend.one_hot(tf.argsort(x,direction='DESCENDING',axis=-1)[...,1],num_classes=x.get_shape().as_list()[1])
+                mask2 = tf.keras.backend.one_hot(tf.argsort(x,direction='DESCENDING',axis=-1)[...,1],num_classes=x.get_shape().as_list()[1])
             else:
                 mask = tf.keras.backend.one_hot(indices=tf.argmax(x, 1), num_classes=x.get_shape().as_list()[1])
 

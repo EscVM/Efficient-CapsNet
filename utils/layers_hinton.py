@@ -19,11 +19,40 @@ import tensorflow as tf
 
 
 def squash(s):
-    n = tf.norm(s,axis=-1,keepdims=True)
-    return tf.multiply(n**2/(1+n**2)/(n+tf.keras.backend.epsilon()),s)
+    """
+    Squash activation function presented in 'Dynamic routinig between capsules'.
+    ...
+    
+    Parameters
+    ----------
+    s: tensor
+        input tensor
+    """
+    n = tf.norm(s, axis=-1,keepdims=True)
+    return tf.multiply(n**2/(1+n**2)/(n + tf.keras.backend.epsilon()), s)
     
 
 class PrimaryCaps(tf.keras.layers.Layer):
+    """
+    Create a primary capsule layer with the methodology described in 'Dynamic routing between capsules'.
+    ...
+    
+    Attributes
+    ----------
+    C: int
+        number of primary capsules
+    L: int
+        primary capsules dimension (number of properties)
+    k: int
+        kernel dimension
+    s: int
+        conv stride
+ 
+    Methods
+    -------
+    call(inputs)
+        compute the primary capsule layer
+    """
     def __init__(self, C, L, k, s, **kwargs):
         super(PrimaryCaps, self).__init__(**kwargs)
         self.C = C
@@ -32,12 +61,12 @@ class PrimaryCaps(tf.keras.layers.Layer):
         self.s = s
         
     def build(self, input_shape):    
-        self.kernel = self.add_weight(shape=(self.k,self.k,input_shape[-1],self.C*self.L),initializer='glorot_uniform',name='kernel')
-        self.biases = self.add_weight(shape=(self.C,self.L),initializer='zeros',name='biases')
+        self.kernel = self.add_weight(shape=(self.k, self.k, input_shape[-1], self.C*self.L), initializer='glorot_uniform', name='kernel')
+        self.biases = self.add_weight(shape=(self.C,self.L), initializer='zeros', name='biases')
         self.built = True
     
     def call(self, inputs):
-        x = tf.nn.conv2d(inputs,self.kernel,self.s,'VALID')
+        x = tf.nn.conv2d(inputs, self.kernel, self.s, 'VALID')
         H,W = x.shape[1:3]
         x = tf.keras.layers.Reshape((H, W, self.C, self.L))(x)
         x /= self.C
@@ -47,7 +76,7 @@ class PrimaryCaps(tf.keras.layers.Layer):
     
     def compute_output_shape(self, input_shape):
         H,W = input_shape.shape[1:3]
-        return (None, (H-self.k)/self.s+1, (W-self.k)/self.s+1, self.C, self.L)
+        return (None, (H - self.k)/self.s + 1, (W - self.k)/self.s + 1, self.C, self.L)
 
     def get_config(self):
         config = {
@@ -60,7 +89,28 @@ class PrimaryCaps(tf.keras.layers.Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 class DigitCaps(tf.keras.layers.Layer):
-    def __init__(self,C,L,routing=None,kernel_initializer='glorot_uniform',**kwargs):
+    """
+    Create a digitcaps layer as described in 'Dynamic routing between capsules'. 
+    
+    ...
+    
+    Attributes
+    ----------
+    C: int
+        number of primary capsules
+    L: int
+        primary capsules dimension (number of properties)
+    routing: int
+        number of routing iterations
+    kernel_initializer:
+        matrix W kernel initializer
+ 
+    Methods
+    -------
+    call(inputs)
+        compute the primary capsule layer
+    """
+    def __init__(self, C, L, routing=None, kernel_initializer='glorot_uniform', **kwargs):
         super(DigitCaps, self).__init__(**kwargs)
         self.C = C
         self.L = L
@@ -74,16 +124,16 @@ class DigitCaps(tf.keras.layers.Layer):
         input_C = input_shape[-2]
         input_L = input_shape[-1]
 
-        self.W = self.add_weight(shape=[H*W*input_C,input_L,self.L*self.C],initializer=self.kernel_initializer,name='W')
-        self.biases = self.add_weight(shape=[self.C,self.L],initializer='zeros',name='biases')
+        self.W = self.add_weight(shape=[H*W*input_C, input_L, self.L*self.C], initializer=self.kernel_initializer, name='W')
+        self.biases = self.add_weight(shape=[self.C,self.L], initializer='zeros', name='biases')
         self.built = True
     
     def call(self, inputs):
         H,W,input_C,input_L = inputs.shape[1:]          # input shape=(None,H,W,input_C,input_L)
-        x = tf.reshape(inputs,(-1,H*W*input_C,input_L)) #     x shape=(None,H*W*input_C,input_L)
+        x = tf.reshape(inputs,(-1, H*W*input_C, input_L)) #     x shape=(None,H*W*input_C,input_L)
         
-        u = tf.einsum('...ji,jik->...jk',x,self.W)      #     u shape=(None,H*W*input_C,C*L)
-        u = tf.reshape(u,(-1,H*W*input_C,self.C,self.L))#     u shape=(None,H*W*input_C,C,L)
+        u = tf.einsum('...ji,jik->...jk', x, self.W)      #     u shape=(None,H*W*input_C,C*L)
+        u = tf.reshape(u,(-1, H*W*input_C, self.C, self.L))#     u shape=(None,H*W*input_C,C,L)
         
         if self.routing:
             #Hinton's routing
@@ -93,11 +143,11 @@ class DigitCaps(tf.keras.layers.Layer):
                 s = tf.reduce_sum(tf.multiply(u,c),axis=1,keepdims=True)   # s shape=(None,1,C,L)
                 s += self.biases       
                 v = squash(s)                                              # v shape=(None,1,C,L)
-                if r<self.routing-1:
-                    b += tf.reduce_sum(tf.multiply(u,v),axis=-1,keepdims=True)
+                if r < self.routing-1:
+                    b += tf.reduce_sum(tf.multiply(u, v), axis=-1, keepdims=True)
             v = v[:,0,...]      # v shape=(None,C,L)
         else:
-            s = tf.reduce_sum(u,axis=1,keepdims=True) 
+            s = tf.reduce_sum(u, axis=1, keepdims=True) 
             s += self.biases
             v = squash(s)
             v = v[:,0,...]

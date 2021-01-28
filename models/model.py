@@ -26,6 +26,34 @@ from tqdm.notebook import tqdm
 
 
 class Model(object):
+    """
+    A class used to share common model functions and attributes.
+    
+    ...
+    
+    Attributes
+    ----------
+    model_name: str
+        name of the model (Ex. 'MNIST')
+    mode: str
+        model modality (Ex. 'test')
+    config_path: str
+        path configuration file
+    verbose: bool
+    
+    Methods
+    -------
+    load_config():
+        load configuration file
+    load_graph_weights():
+        load network weights
+    predict(dataset_test):
+        use the model to predict dataset_test
+    evaluate(X_test, y_test):
+        comute accuracy and test error with the given dataset (X_test, y_test)
+    save_graph_weights():
+        save model weights
+    """
     def __init__(self, model_name, mode='test', config_path='config.json', verbose=True):
         self.model_name = model_name
         self.model = None
@@ -52,7 +80,6 @@ class Model(object):
             
         
     def predict(self, dataset_test):
-        """Return a y_pred and X_gen"""
         return self.model.predict(dataset_test)
     
 
@@ -68,13 +95,12 @@ class Model(object):
         else:
             y_pred, X_gen =  self.model.predict(X_test)
             acc = np.sum(np.argmax(y_pred, 1) == np.argmax(y_test, 1))/y_test.shape[0]
-        test_error = 1 - acc
         print('Test acc:', acc)
-        print(f"Test error [%]: {(test_error):.4%}")
+        print(f"Test error [%]: {(1 - acc):.4%}")
         if self.model_name == "MULTIMNIST":
-            print(f"N° misclassified images: {test_error*self.config['n_overlay_multimnist']*len(y_test)} out of {self.config['n_overlay_multimnist']*len(y_test)}")
+            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
         else:
-            print(f"N° misclassified images: {test_error*len(y_test)} out of {len(y_test)}")
+            print(f"N° misclassified images: {np.sum(np.argmax(y_pred, 1) != np.argmax(y_test, 1))} out of {len(y_test)}")
 
 
     def save_graph_weights(self):
@@ -83,6 +109,32 @@ class Model(object):
 
 
 class EfficientCapsNet(Model):
+    """
+    A class used to manage an Efficiet-CapsNet model. 'model_name' and 'mode' define the particular architecure and modality of the 
+    generated network.
+    
+    ...
+    
+    Attributes
+    ----------
+    model_name: str
+        name of the model (Ex. 'MNIST')
+    mode: str
+        model modality (Ex. 'test')
+    config_path: str
+        path configuration file
+    custom_path: str
+        custom weights path
+    verbose: bool
+    
+    Methods
+    -------
+    load_graph():
+        load the network graph given the model_name
+    train(dataset, initial_epoch)
+        train the constructed network with a given dataset. All train hyperparameters are defined in the configuration file
+
+    """
     def __init__(self, model_name, mode='test', config_path='config.json', custom_path=None, verbose=True):
         Model.__init__(self, model_name, mode, config_path, verbose)
         if custom_path != None:
@@ -124,7 +176,7 @@ class EfficientCapsNet(Model):
 
         history = self.model.fit(dataset_train,
           epochs=self.config[f'epochs'],
-          validation_data=dataset_val, batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
+          validation_data=(dataset_val), batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
           callbacks=callbacks)
         
         return history
@@ -133,6 +185,30 @@ class EfficientCapsNet(Model):
         
         
 class CapsNet(Model):
+    """
+    A class used to manage the original CapsNet architecture.
+    
+    ...
+    
+    Attributes
+    ----------
+    model_name: str
+        name of the model (only MNIST provided)
+    mode: str
+        model modality (Ex. 'test')
+    config_path: str
+        path configuration file
+    verbose: bool
+    n_routing: int
+        number of routing interations
+    
+    Methods
+    -------
+    load_graph():
+        load the network graph given the model_name
+    train():
+        train the constructed network with a given dataset. All train hyperparameters are defined in the configuration file
+    """
     def __init__(self, model_name, mode='test', config_path='config.json', custom_path=None, verbose=True, n_routing=3):
         Model.__init__(self, model_name, mode, config_path, verbose)   
         self.n_routing = n_routing
@@ -166,7 +242,7 @@ class CapsNet(Model):
 
         history = self.model.fit(dataset_train,
           epochs=self.config['epochs'],
-          validation_data=dataset_val, batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
+          validation_data=(dataset_val), batch_size=self.config['batch_size'], initial_epoch=initial_epoch,
           callbacks=callbacks)
         
         return history
