@@ -8,3 +8,4 @@ matplotlib
 pytest
 jupyter
 tensorflow-datasets
+Pillow
