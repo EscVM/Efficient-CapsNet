@@ -86,11 +86,11 @@ class Model(object):
     def evaluate(self, X_test, y_test):
         print('-'*30 + f'{self.model_name} Evaluation' + '-'*30)
         if self.model_name == "MULTIMNIST":
-            dataset_test = pre_process_multimnist.generate_tf_data_test(X_test,y_test,n_multi=self.config['n_overlay_multimnist'])
+            dataset_test = pre_process_multimnist.generate_tf_data_test(X_test, y_test, self.config["shift_multimnist"], n_multi=self.config['n_overlay_multimnist'])
             acc = []
             for X,y in tqdm(dataset_test,total=len(X_test)):
-                y_pred,X_gen1,X_gen2 = model_eval.predict(X)
-                acc.append(multiAccuracy(y_test, y_pred))
+                y_pred,X_gen1,X_gen2 = self.model.predict(X)
+                acc.append(multiAccuracy(y, y_pred))
             acc = np.mean(acc)
         else:
             y_pred, X_gen =  self.model.predict(X_test)

@@ -17,43 +17,26 @@ import numpy as np
 import tensorflow as tf
 import os
 import cv2
-tf2 = tf.compat.v2
 
 # constants
-MNIST_IMG_SIZE = 36
-MNIST_TRAIN_IMAGE_COUNT = 60000
-PARALLEL_INPUT_CALLS = 16
-
+MULTIMNIST_IMG_SIZE = 36
 
 def pad_dataset(images,pad):
     return np.pad(images,[(0,0),(pad,pad),(pad,pad)])
 
-def pre_process(image, label, pad):
+def pre_process(image, label):
     return (image / 255)[...,None].astype('float32'), tf.keras.utils.to_categorical(label, num_classes=10)
 
 def shift_images(images, shifts, max_shift):
     l = images.shape[1]
-    images_sh = np.pad(images,((0,0),(max_shift,max_shift),(max_shift,max_shift)))
+    images_sh = np.pad(images,((0,0),(max_shift,max_shift),(max_shift,max_shift),(0,0)))
     shifts = max_shift - shifts
     batches = np.arange(len(images))[:,None,None]
     images_sh = images_sh[batches,np.arange(l+max_shift*2)[None,:,None],(shifts[:,0,None]+np.arange(0,l))[:,None,:]]
     images_sh = images_sh[batches,(shifts[:,1,None]+np.arange(0,l))[...,None],np.arange(l)[None,None]]
     return images_sh
 
-def merge_all_images(images,labels):
-    indexes_per_class = [np.arange(len(images))[np.bitwise_not(np.argmax(labels,axis=-1)==i)] for i in range(10)]
-    indexes = np.array([np.random.choice(indexes_per_class[np.argmax(labels[i])]) for i in range(len(images))])
-    top_images = images[indexes]
-    top_labels = labels[indexes]
-    shifts = np.random.randint(-shift,shift+1,(len(images)*2,2))
-    images_sh = shift_images(np.concatenate((images,top_images),axis=0),shifts,shift)
-    base_sh = images_sh[:len(images)]
-    top_sh = images_sh[len(images):]
-    merged = np.clip(base_sh+top_sh,0,1)
-    merged_labels = labels+top_labels
-    return merged,merged_labels,base_sh,top_sh,top_labels
-
-def merge_with_image(images,labels,i,n_multi=1000): #for an image i, generate n_multi merged images
+def merge_with_image(images,labels,i,shift,n_multi=1000): #for an image i, generate n_multi merged images
     base_image = images[i]
     base_label = labels[i]
     indexes = np.arange(len(images))[np.bitwise_not((labels==base_label).all(axis=-1))]
@@ -68,54 +51,56 @@ def merge_with_image(images,labels,i,n_multi=1000): #for an image i, generate n_
     merged_labels = base_label+top_labels
     return merged,merged_labels
 
-def multi_mnist_generator(images,labels):
+def multi_mnist_generator(images,labels,shift):
     def multi_mnist():
         while True:
             i = np.random.randint(len(images))
             j = np.random.randint(len(images))
             while np.all(images[i]==images[j]):
                 j = np.random.randint(len(images))
-            base = shift_images(images[i:i+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0,...,None]
-            top = shift_images(images[j:j+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0,...,None]
+            base = shift_images(images[i:i+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0]
+            top = shift_images(images[j:j+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0]
             merged = tf.clip_by_value(tf.add(base, top),0,1)
             yield (merged,labels[i],labels[j]),(labels[i]+labels[j],base,top)
     return multi_mnist
     
-def multi_mnist_generator_validation(images,labels):
+def multi_mnist_generator_validation(images,labels,shift):
     def multi_mnist_val():
         for i in range(len(images)):
             j = np.random.randint(len(images))
             while np.all(labels[i]==labels[j]):
                 j = np.random.randint(len(images))
-            base = shift_images(images[i:i+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0,...,None]
-            top = shift_images(images[j:j+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0,...,None]
+            base = shift_images(images[i:i+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0]
+            top = shift_images(images[j:j+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0]
             merged = tf.clip_by_value(tf.add(base, top),0,1)
             yield (merged,label[i],labels[j]),(labels[i]+labels[j],base,top)
     return multi_mnist_val
 
-def multi_mnist_generator_test(images,labels,n_multi=1000):
+def multi_mnist_generator_test(images,labels,shift,n_multi=1000):
     def multi_mnist_test():
         for i in range(len(images)):
-            X_merged,y_merged = merge_with_image(images,labels,i,n_multi)
-            yield X_merged[...,None],y_merged
+            X_merged,y_merged = merge_with_image(images,labels,i,shift,n_multi)
+            yield X_merged,y_merged
     return multi_mnist_test 
 
-def generate_tf_data(X_train, y_train, X_test, y_test, batch_size):
-    dataset_train = tf.data.Dataset.from_generator(multi_mnist_generator(X_train,y_train),
+def generate_tf_data(X_train, y_train, X_test, y_test, batch_size, shift):
+    input_shape = (MULTIMNIST_IMG_SIZE,MULTIMNIST_IMG_SIZE,1)
+    dataset_train = tf.data.Dataset.from_generator(multi_mnist_generator(X_train,y_train,shift),
                                                    output_shapes=((input_shape,(10,),(10,)),((10,),input_shape,input_shape)),
                                                    output_types=((tf.float32,tf.float32,tf.float32),
                                                                  (tf.float32,tf.float32,tf.float32)))
     dataset_train = dataset_train.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
-    dataset_test = tf.data.Dataset.from_generator(multi_mnist_generator_validation(X_test,y_test),
+    dataset_test = tf.data.Dataset.from_generator(multi_mnist_generator_validation(X_test,y_test,shift),
                                                  output_shapes=((input_shape,(10,),(10,)),((10,),input_shape,input_shape)),
                                                  output_types=((tf.float32,tf.float32,tf.float32),
                                                                (tf.float32,tf.float32,tf.float32)))
     dataset_test = dataset_test.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
     return dataset_train, dataset_test
 
-def generate_tf_data_test(X_test,y_test,n_multi=1000,random_seed=42):
+def generate_tf_data_test(X_test, y_test, shift, n_multi=1000, random_seed=42):
+    input_shape = (MULTIMNIST_IMG_SIZE,MULTIMNIST_IMG_SIZE,1)
     np.random.seed(random_seed)
-    dataset_test = tf.data.Dataset.from_generator(multi_mnist_generator_test(X_test,y_test,n_multi),
+    dataset_test = tf.data.Dataset.from_generator(multi_mnist_generator_test(X_test,y_test,shift,n_multi),
                                                   output_shapes=((n_multi,)+input_shape,(n_multi,10,)),
                                                   output_types=(tf.float32,tf.float32))
     dataset_test = dataset_test.prefetch(tf.data.experimental.AUTOTUNE)

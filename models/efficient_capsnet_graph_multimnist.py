@@ -37,7 +37,7 @@ def efficient_capsnet_graph(input_shape):
     x = tf.keras.layers.BatchNormalization()(x)
     x = tf.keras.layers.Conv2D(128,3,2, activation='relu', padding='valid', kernel_initializer='he_normal')(x)   
     x = tf.keras.layers.BatchNormalization()(x)
-    x = PrimaryCaps(128, 5, 16, 8)(x)
+    x = PrimaryCaps(128, 5, 16, 8, 2)(x)
     
     digit_caps = FCCaps(10,16)(x)
     
@@ -77,8 +77,8 @@ def build_graph(input_shape, mode, verbose):
     verbose: bool
     """
     inputs = tf.keras.Input(input_shape)
-    y_true = tf.keras.layers.Input(shape=(10,))
-    noise = tf.keras.layers.Input(shape=(10, 16))
+    y_true1 = tf.keras.layers.Input(shape=(10,))
+    y_true2 = tf.keras.layers.Input(shape=(10,))
 
     efficient_capsnet = efficient_capsnet_graph(input_shape)
 
@@ -87,11 +87,9 @@ def build_graph(input_shape, mode, verbose):
         print("\n\n")
     
     digit_caps, digit_caps_len = efficient_capsnet(inputs)
-    noised_digitcaps = tf.keras.layers.Add()([digit_caps, noise]) # only if mode is play
     
-    masked_by_y1,masked_by_y2 = Mask()([digit_caps, y_true],double_mask=True)  
+    masked_by_y1,masked_by_y2 = Mask()([digit_caps, y_true1, y_true2],double_mask=True)  
     masked1,masked2 = Mask()(digit_caps,double_mask=True)
-    masked_noised_y1,masked_noised_y2 = Mask()([noised_digitcaps, y_true],double_mask=True)
     
     generator = generator_graph(input_shape)
 
@@ -101,13 +99,10 @@ def build_graph(input_shape, mode, verbose):
 
     x_gen_train1,x_gen_train2 = generator(masked_by_y1),generator(masked_by_y2)
     x_gen_eval1,x_gen_eval2 = generator(masked1),generator(masked2)
-    x_gen_play1,x_gen_play2 = generator(masked_noised_y1),generator(masked_noised_y2)
 
     if mode == 'train':   
         return tf.keras.models.Model([inputs, y_true], [digit_caps_len, x_gen_train1,x_gen_train2], name='Efficinet_CapsNet_Generator')
     elif mode == 'test':
         return tf.keras.models.Model(inputs, [digit_caps_len, x_gen_eval1,x_gen_eval2], name='Efficinet_CapsNet_Generator')
-    elif mode == 'play':
-        return tf.keras.models.Model([inputs, y_true, noise], [digit_caps_len, x_gen_play1,x_gen_play2], name='Efficinet_CapsNet_Generator')
     else:
         raise RuntimeError('mode not recognized')

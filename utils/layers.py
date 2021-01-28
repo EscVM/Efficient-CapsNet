@@ -98,27 +98,29 @@ class PrimaryCaps(tf.keras.layers.Layer):
     ----------
     F: int
         depthwise conv number of features
-    k: int
+    K: int
         depthwise conv kernel dimension
     N: int
         number of primary capsules
     D: int
         primary capsules dimension (number of properties)
- 
+    s: int
+        depthwise conv strides
     Methods
     -------
     call(inputs)
         compute the primary capsule layer
     """
-    def __init__(self, F, K, N, D, **kwargs):
+    def __init__(self, F, K, N, D, s, **kwargs):
         super(PrimaryCaps, self).__init__(**kwargs)
         self.F = F
         self.K = K
         self.N = N
         self.D = D
+        self.s = s
         
     def build(self, input_shape):    
-        self.DW_Conv2D = tf.keras.layers.Conv2D(self.F, self.K,
+        self.DW_Conv2D = tf.keras.layers.Conv2D(self.F, self.K, self.s,
                                              activation='linear', groups=self.F, padding='valid')
 
         self.built = True
@@ -253,9 +255,10 @@ class Mask(tf.keras.layers.Layer):
         if double_mask:
             masked1 = tf.keras.backend.batch_flatten(inputs * tf.expand_dims(mask1, -1))
             masked2 = tf.keras.backend.batch_flatten(inputs * tf.expand_dims(mask2, -1))
+            return masked1, masked2
         else:
             masked = tf.keras.backend.batch_flatten(inputs * tf.expand_dims(mask, -1))
-        return masked
+            return masked
 
     def compute_output_shape(self, input_shape):
         if type(input_shape[0]) is tuple:  
