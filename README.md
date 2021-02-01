@@ -60,8 +60,7 @@ Use this bibtex if you enjoyed this repository and you want to cite it:
   title={Efficient-CapsNet: Capsule Network withSelf-Attention Routing},
   author={Mazzia, Vittorio and Salvetti, Francesco and Chiaberge, Marcello},
   year={2021},
-  publisher={Github},
-  journal={GitHub repository},
+  journal={arXiv e-prints},
   howpublished={\url{https://github.com/EscVM/Efficient-CapsNet}},
 }
 ```
