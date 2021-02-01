@@ -50,11 +50,6 @@ Nevertheless, there's a really negative note (at least for us:)); as all other r
 The network is trained with a reconstruction regularizer that is simply a fully connected network trained in conjuction with the main one. So, we can use it to visualize the inner capsules reppresentations. In particular, we should expect that a dimension of a digit capsule should learn to span the space of variations in the way digits of that class are instantiated. We can see what the individual dimensions represent by making use of the decoder network and injecting some noise to one of the dimensions of the main digit capsule layer that is predicting the class of the input.
 
 So, we coded a practical notebook in which you can dynamically tweak whichever dimension you want of the capsule that is making the prediction (longest one).
-
-Finally, if you don't have the necessary resources (GP-GPU holy grail) you can still try this interesting notebook out on [Colab](https://colab.research.google.com/drive/1hEnjNiTRVkQczIvfIxskfoOTligNRjQG?usp=sharing).
- <p align="center">
-  <img width="850" height="400" src="media/dimension_perturbation.gif">
- </p>
  
 # Citation
 Use this bibtex if you enjoyed this repository and you want to cite it:
