@@ -8,3 +8,4 @@ matplotlib
 pytest
 jupyter
 tensorflow-datasets
+matplotlib==3.3.1
