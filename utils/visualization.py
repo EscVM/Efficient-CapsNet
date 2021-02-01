@@ -48,9 +48,9 @@ class AffineVisualizer(object):
             fig, ax = plt.subplots(1, 3, figsize=(15,3))
         else:
             fig, ax = plt.subplots(1, 2, figsize=(12,12))
-        ax[0].imshow(self.X[index], cmap='gray')
+        ax[0].imshow(self.X[index,...,0], cmap='gray')
         ax[0].set_title('Input Digit')
-        ax[1].imshow(X_gen[0], cmap='gray')
+        ax[1].imshow(X_gen[0,...,0], cmap='gray')
         ax[1].set_title('Output Generator')
         if self.hist:
             ax[2].set_title('Output Caps Length')
