@@ -1,4 +1,4 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/efficient-capsnet-capsule-network-with-self/image-classification-on-smallnorb)](https://paperswithcode.com/sota/image-classification-on-smallnorb?p=efficient-capsnet-capsule-network-with-self)[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/efficient-capsnet-capsule-network-with-self/image-classification-on-mnist)](https://paperswithcode.com/sota/image-classification-on-mnist?p=efficient-capsnet-capsule-network-with-self)[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
 <h1 align="center"> ~ Efficient-CapsNet ~ </h1>
