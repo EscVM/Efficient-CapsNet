@@ -4,7 +4,7 @@ tensorflow-addons
 opencv-python
 tqdm
 tensorflow
-matplotlib==3.3.1
+matplotlib
 pytest
 jupyter
 tensorflow-datasets
