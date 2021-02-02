@@ -65,6 +65,5 @@ Use this bibtex if you enjoyed this repository and you want to cite it:
   author={Mazzia, Vittorio and Salvetti, Francesco and Chiaberge, Marcello},
   year={2021},
   journal={arXiv e-prints},
-  howpublished={\url{https://github.com/EscVM/Efficient-CapsNet}},
 }
 ```
