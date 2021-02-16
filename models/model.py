@@ -166,7 +166,7 @@ class EfficientCapsNet(Model):
             self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
               loss=[marginLoss, 'mse', 'mse'],
               loss_weights=[1., self.config['lmd_gen']/2,self.config['lmd_gen']/2],
-              metrics={'Efficient_CapsNet': 'accuracy'})
+              metrics={'Efficient_CapsNet': multiAccuracy})
             steps = 10*int(dataset.y_train.shape[0] / self.config['batch_size'])
         else:
             self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
@@ -239,7 +239,7 @@ class CapsNet(Model):
         self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config['lr']),
               loss=[marginLoss, 'mse'],
               loss_weights=[1., self.config['lmd_gen']],
-              metrics={'Original_CapsNet': multiAccuracy})
+              metrics={'Original_CapsNet': 'accuracy'})
 
         print('-'*30 + f'{self.model_name} train' + '-'*30)
 
