@@ -51,8 +51,8 @@ The network is trained with a reconstruction regularizer that is simply a fully 
 
 So, we coded a practical notebook in which you can dynamically tweak whichever dimension you want of the capsule that is making the prediction (longest one).
 
-Finally, if you don't have the necessary resources (GP-GPU holy grail) you can still try this interesting notebook out on [Colab](https://colab.research.google.com/drive/1hEnjNiTRVkQczIvfIxskfoOTligNRjQG?usp=sharing).
-<a href="https://colab.research.google.com/drive/1hEnjNiTRVkQczIvfIxskfoOTligNRjQG?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+Finally, if you don't have the necessary resources (GP-GPU holy grail) you can still try this interesting notebook out on 
+<a href="https://colab.research.google.com/drive/1hEnjNiTRVkQczIvfIxskfoOTligNRjQG?usp=sharing"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
  <p align="center">
   <img width="850" height="400" src="media/dimension_perturbation.gif">
  </p>
