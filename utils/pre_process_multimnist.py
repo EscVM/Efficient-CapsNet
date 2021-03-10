@@ -73,7 +73,7 @@ def multi_mnist_generator_validation(images,labels,shift):
             base = shift_images(images[i:i+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0]
             top = shift_images(images[j:j+1],np.random.randint(-shift,shift+1,(1,2)),shift)[0]
             merged = tf.clip_by_value(tf.add(base, top),0,1)
-            yield (merged,label[i],labels[j]),(labels[i]+labels[j],base,top)
+            yield (merged,labels[i],labels[j]),(labels[i]+labels[j],base,top)
     return multi_mnist_val
 
 def multi_mnist_generator_test(images,labels,shift,n_multi=1000):
