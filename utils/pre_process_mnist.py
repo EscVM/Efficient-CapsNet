@@ -113,14 +113,16 @@ def generator(image, label):
 def generate_tf_data(X_train, y_train, X_test, y_test, batch_size):
 	dataset_train = tf.data.Dataset.from_tensor_slices((X_train,y_train))
 	dataset_train = dataset_train.shuffle(buffer_size=MNIST_TRAIN_IMAGE_COUNT)
-	dataset_train = dataset_train.map(image_rotate_random)
+	dataset_train = dataset_train.map(image_rotate_random, 
+	    num_parallel_calls=PARALLEL_INPUT_CALLS)
 	dataset_train = dataset_train.map(image_shift_rand,
 	    num_parallel_calls=PARALLEL_INPUT_CALLS)
 	dataset_train = dataset_train.map(image_squish_random,
 	    num_parallel_calls=PARALLEL_INPUT_CALLS)
 	dataset_train = dataset_train.map(image_erase_random,
 	   num_parallel_calls=PARALLEL_INPUT_CALLS)
-	dataset_train = dataset_train.map(generator, num_parallel_calls=PARALLEL_INPUT_CALLS)
+	dataset_train = dataset_train.map(generator, 
+	   num_parallel_calls=PARALLEL_INPUT_CALLS)
 	dataset_train = dataset_train.batch(batch_size)
 	dataset_train = dataset_train.prefetch(-1)
 
