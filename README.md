@@ -62,9 +62,11 @@ Use this bibtex if you enjoyed this repository and you want to cite it:
 
 ```
 @article{mazzia2021efficient,
-  title={Efficient-CapsNet: Capsule Network with Self-Attention Routing},
+  title={Efficient-CapsNet: capsule network with self-attention routing},
   author={Mazzia, Vittorio and Salvetti, Francesco and Chiaberge, Marcello},
   year={2021},
-  journal={arXiv preprint arXiv:2101.12491},
+  journal={Scientific reports},
+  publisher={Nature Publishing Group},
+  volume={11}
 }
 ```
