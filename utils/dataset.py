@@ -68,7 +68,20 @@ class Dataset(object):
 
     def get_dataset(self):
         if self.model_name == 'MNIST':
-            (self.X_train, self.y_train), (self.X_test, self.y_test) = tf.keras.datasets.mnist.load_data(path=self.config['mnist_path'])
+            ###이 부분부터 데이콘 데이터로 바꿔치기
+            train_data = pd.read_csv('data/dataset/train/train_data.csv')
+            train_data
+            train_file_name = train_data['file_name']
+            train_label = train_data['label']
+            train_label=np.array(train_label, dtype='uint8')
+            # image 파일을 불러와서 list에 담아줍니다.
+            train_image = []
+            for file in train_file_name:
+                train_image.append(np.array((Image.open("data/dataset/train/"+file))))
+            train_image=np.array(train_image)
+            (custom_train,custom_label)=(train_image,train_label)
+            ###여기까지, 아래는 원본 데이터 불러오기 주석처리
+            #(self.X_train, self.y_train), (self.X_test, self.y_test) = tf.keras.datasets.mnist.load_data(path=self.config['mnist_path'])
             # prepare the data
             self.X_train, self.y_train = pre_process_mnist.pre_process(self.X_train, self.y_train)
             self.X_test, self.y_test = pre_process_mnist.pre_process(self.X_test, self.y_test)
