@@ -111,7 +111,7 @@ class Model(object):
 
 class EfficientCapsNet(Model):
     """
-    A class used to manage an Efficiet-CapsNet model. 'model_name' and 'mode' define the particular architecure and modality of the 
+    A class used to manage an Efficiet-CapsNet model. 'model_name' and 'mode' define the particular architecture and modality of the 
     generated network.
     
     ...
